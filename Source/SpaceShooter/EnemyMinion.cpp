@@ -12,6 +12,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "DrawDebugHelpers.h"
 #include "SpaceShooterPawn.h"
+#include "ShipStatistics.h"
 // Sets default values
 AEnemyMinion::AEnemyMinion()
 {
@@ -39,10 +40,18 @@ AEnemyMinion::AEnemyMinion()
 	ShootPoint = CreateDefaultSubobject<USceneComponent>(TEXT("ShootPoint"));
 	ShootPoint->SetupAttachment(PlaneMesh, TEXT("CenterShootPoint"));
 
-	
+	Stats = CreateDefaultSubobject<UShipStatistics>(TEXT("ShipStatisticsComponent"));
+	Stats->Health = 100;
+	Stats->Energy = 100;
 
 	DetectionRadius = 7000;
+	ShootDetectionRadius = 3000;
+	TurnSpeed = 2; // Uses Time
+	ChaseSpeed = 5000; //Uses Clamp
+	HoverSpeed = 2; //Uses Time
+	ShootDelay = .5f;
 
+	HoverStoppingDistance = 1000;
 }
 
 void AEnemyMinion::Fire()
@@ -104,7 +113,11 @@ void AEnemyMinion::Tick(float DeltaTime)
 				if (Player->bIsHovering)
 				{
 					
-					SetActorLocation(FMath::VInterpTo(GetActorLocation(), Player->GetActorLocation(), DeltaTime, MinSpeed));
+					FVector Location;
+					Location = (GetActorLocation() - Player->GetActorLocation()).GetSafeNormal() * HoverStoppingDistance + Player->GetActorLocation();
+
+
+					SetActorLocation(FMath::VInterpTo(GetActorLocation(), Location, DeltaTime, HoverSpeed));
 
 					FRotator Rotation;
 
@@ -116,7 +129,7 @@ void AEnemyMinion::Tick(float DeltaTime)
 				}
 				else
 				{
-					const FVector LocalMove = FVector(MaxSpeed * DeltaTime, 0, 0);
+					const FVector LocalMove = FVector(ChaseSpeed * DeltaTime, 0, 0);
 
 
 					// Move plan forwards (with sweep so we stop when we collide with things)
@@ -134,12 +147,16 @@ void AEnemyMinion::Tick(float DeltaTime)
 				}
 				setShootDelay -= DeltaTime;
 
-
-				if (setShootDelay <= 0)
+				if (CastSphere(GetActorLocation(), ShootDetectionRadius))
 				{
-					setShootDelay = ShootDelay;
-					Fire();
+					if (setShootDelay <= 0)
+					{
+						setShootDelay = ShootDelay;
+						Fire();
+					}
 				}
+				
+
 
 			}
 		
@@ -154,7 +171,7 @@ void AEnemyMinion::Tick(float DeltaTime)
 	
 }
 
-bool AEnemyMinion::CastSphere(FVector Location, float Radius)
+bool AEnemyMinion::CastSphere(FVector Location, float Radius, bool bShouldDebug)
 {
 	FHitResult HitResult;
 	bool hashit = GetWorld()->SweepSingleByChannel(
@@ -165,9 +182,19 @@ bool AEnemyMinion::CastSphere(FVector Location, float Radius)
 		ECollisionChannel::ECC_GameTraceChannel3,
 		FCollisionShape::MakeSphere(Radius)
 	);
-	FColor ResultColor = hashit ? FColor::Green : FColor::Red;
-	
-	DrawDebugSphere(GetWorld(), Location, Radius, 45, ResultColor, false, 0);
+	if (bShouldDebug)
+	{
+		FColor ResultColor = hashit ? FColor::Green : FColor::Red;
+
+		DrawDebugSphere(GetWorld(), Location, Radius, 45, ResultColor, false, 0);
+		
+	}
 	return hashit;
+}
+
+float AEnemyMinion::TakeDamage(float Damage, FDamageEvent const & DamageEvent, AController * EventInstigator, AActor * DamageCauser)
+{
+	Stats->LowerStat(Stats->Health, Damage);
+	return 0.0f;
 }
 

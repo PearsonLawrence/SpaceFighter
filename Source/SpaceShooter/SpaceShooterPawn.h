@@ -13,32 +13,34 @@ class ASpaceShooterPawn : public APawn
 	GENERATED_BODY()
 
 		/** StaticMesh component that will be the visuals for our flying pawn */
-		UPROPERTY(Category = Mesh, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		class UStaticMeshComponent* PlaneMesh;
+	UPROPERTY(Category = Mesh, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	class UStaticMeshComponent* PlaneMesh;
 
 	/** Spring arm that will offset the camera */
 	UPROPERTY(Category = Camera, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		class USpringArmComponent* SpringArm;
+	class USpringArmComponent* SpringArm;
 
 	/** Camera component that will be our viewpoint */
 	UPROPERTY(Category = Camera, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		class UCameraComponent* Camera;
+	class UCameraComponent* Camera;
 
 	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
-		UStaticMeshComponent* Cannon1;
+	UStaticMeshComponent* Cannon1;
 
 	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
-		UStaticMeshComponent* Cannon2;
+	UStaticMeshComponent* Cannon2;
 
 	UPROPERTY(EditAnywhere, Category = Projectile)
-		TSubclassOf<class ABaseProjectile> ProjectileClass;
+	TSubclassOf<class ABaseProjectile> ProjectileClass;
 
+	UPROPERTY(VisibleAnywhere)
+	class UShipStatistics* Stats;
 
 	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
-		class USceneComponent* ShootPointLeft;
+	class USceneComponent* ShootPointLeft;
 
 	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
-		class USceneComponent* ShootPointRight;
+	class USceneComponent* ShootPointRight;
 
 public:
 	ASpaceShooterPawn();
@@ -91,6 +93,10 @@ private:
 	/** How quickly pawn can steer */
 	UPROPERTY(Category = Speed, EditAnywhere)
 		float TurnSpeed;
+	UPROPERTY(Category = Speed, EditAnywhere)
+		float HoverTurnSpeed;
+
+
 
 	/** Max forward speed */
 	UPROPERTY(Category = Speed, EditAnywhere)
@@ -144,8 +150,11 @@ private:
 	FVector HoverMove;
 public:
 
+	//virtual float TakeDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser) override;
+
 	UPROPERTY(Category = Flying, EditAnywhere)
-		bool bIsHovering;
+	bool bIsHovering;
 	/** Returns PlaneMesh subobject **/
 	FORCEINLINE class UStaticMeshComponent* GetPlaneMesh() const { return PlaneMesh; }
 	/** Returns SpringArm subobject **/

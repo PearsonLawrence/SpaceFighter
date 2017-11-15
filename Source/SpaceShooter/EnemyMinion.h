@@ -17,20 +17,23 @@ public:
 
 
 	UPROPERTY(Category = Mesh, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		class UStaticMeshComponent* PlaneMesh;
+	class UStaticMeshComponent* PlaneMesh;
 
 	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
-		class USceneComponent* ShootPoint;
+	class USceneComponent* ShootPoint;
 
-	
+
+	UPROPERTY(VisibleAnywhere)
+	class UShipStatistics* Stats;
+
 	UPROPERTY(EditAnywhere, Category = Projectile)
-		TSubclassOf<class ABaseProjectile> ProjectileClass;
+	TSubclassOf<class ABaseProjectile> ProjectileClass;
 
 	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
-		UStaticMeshComponent* Cannon1;
+	UStaticMeshComponent* Cannon1;
 
 	UPROPERTY(VisibleDefaultsOnly, Category = Reference)
-		class ASpaceShooterPawn* Player;
+	class ASpaceShooterPawn* Player;
 
 	bool ToggleDetection;
 
@@ -45,37 +48,38 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	UPROPERTY(Category = shooting, EditAnywhere)
-		float ShootDelay;
+	float ShootDelay;
 
 	float setShootDelay;
 	/** How quickly forward speed changes */
 	UPROPERTY(Category = Speed, EditAnywhere)
-		float Acceleration;
-	UPROPERTY(Category = Speed, EditAnywhere)
-		float HoverAcceleration;
+	float Acceleration;
 
 	/** How quickly pawn can steer */
 	UPROPERTY(Category = Speed, EditAnywhere)
-		float TurnSpeed;
+	float TurnSpeed;
 
 	/** Max forward speed */
 	UPROPERTY(Category = Speed, EditAnywhere)
-		float MaxSpeed;
+	float ChaseSpeed;
 
 	/** Min forward speed */
 	UPROPERTY(Category = Speed, EditAnywhere)
-		float MinSpeed;
-
-	UPROPERTY(Category = Speed, EditAnywhere)
-		float HoverMaxSpeed;
+	float HoverSpeed;
 
 	/** Min forward speed */
-	UPROPERTY(Category = Speed, EditAnywhere)
-		float HoverMinSpeed;
-	UPROPERTY(Category = Speed, EditAnywhere)
-		float HoverDrag;
+	
 	UPROPERTY(Category = Detection, EditAnywhere)
-		float DetectionRadius;
+	float DetectionRadius;
+	UPROPERTY(Category = Detection, EditAnywhere)
+	float ShootDetectionRadius;
 
-	bool CastSphere(FVector Location, float Radius);
+	UPROPERTY(Category = Chase, EditAnywhere)
+		float HoverStoppingDistance;
+
+
+	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser) override;
+
+
+	bool CastSphere(FVector Location, float Radius, bool bShouldDebug = false);
 };

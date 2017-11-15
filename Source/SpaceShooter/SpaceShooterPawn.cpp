@@ -13,6 +13,8 @@
 #include "Cannon.h"
 #include "BaseProjectile.h"
 #include "Components/PrimitiveComponent.h"
+#include "ShipStatistics.h"
+
 ASpaceShooterPawn::ASpaceShooterPawn()
 {
 	// Structure to hold one-time initialization
@@ -61,18 +63,24 @@ ASpaceShooterPawn::ASpaceShooterPawn()
 	ShootPointRight = CreateDefaultSubobject<USceneComponent>(TEXT("ShootRight"));
 	ShootPointRight->SetupAttachment(PlaneMesh, TEXT("RightShootPoint"));
 
+	Stats = CreateDefaultSubobject<UShipStatistics>(TEXT("ShipStatisticsComponent"));
+	Stats->Health = 100;
+	Stats->Energy = 100;
+
 
 	// Set handling parameters
-	Acceleration = 500.f;
-	TurnSpeed = 50.f;
-	MaxSpeed = 4000.f;
-	MinSpeed = 500.f;
+	Acceleration = 2000;
+	TurnSpeed = 100;
+	HoverTurnSpeed = 150;
+	MaxSpeed = 7000.f;
+	MinSpeed = 2000.f;
 	CurrentForwardSpeed = 500.f;
 
 	HoverAcceleration = 200.f;
 
-	HoverMaxSpeed = 4000.f;
-	HoverMinSpeed = -4000.f;
+	HoverMaxSpeed = 50;
+	HoverMinSpeed = -50;
+	HoverDrag = 3.f;
 	ShootDelay = .05f;
 	RotateSpeed = 1.f;
 	
@@ -300,7 +308,7 @@ void ASpaceShooterPawn::HoverPitch(float Val)
 	if (bIsHovering)
 	{
 		// Target pitch speed is based in input
-		float TargetPitchSpeed = (Val * TurnSpeed * -1.f);
+		float TargetPitchSpeed = (Val * HoverTurnSpeed * -1.f);
 
 		//// When steering, we decrease pitch slightly
 		TargetPitchSpeed += (FMath::Abs(CurrentYawSpeed) * -0.2f);
@@ -316,7 +324,7 @@ void ASpaceShooterPawn::HoverYaw(float Val)
 	if (bIsHovering)
 	{
 		// Target yaw speed is based on input
-		float TargetYawSpeed = (Val * TurnSpeed);
+		float TargetYawSpeed = (Val * HoverTurnSpeed);
 
 		// Smoothly interpolate to target yaw speed
 		CurrentYawSpeed = FMath::FInterpTo(CurrentYawSpeed, TargetYawSpeed, GetWorld()->GetDeltaSeconds(), 2.f);
@@ -332,7 +340,7 @@ void ASpaceShooterPawn::HoverRoll(float Val)
 	{
 		// If turning, yaw value is used to influence roll
 		// If not turning, rol to reverse current roll value.
-		float TargetRollSpeed = (Val * TurnSpeed * -1.f);
+		float TargetRollSpeed = (Val * HoverTurnSpeed * -1.f);
 
 		TargetRollSpeed += (FMath::Abs(CurrentYawSpeed) * -0.2f);
 
@@ -340,3 +348,10 @@ void ASpaceShooterPawn::HoverRoll(float Val)
 		CurrentRollSpeed = FMath::FInterpTo(CurrentRollSpeed, TargetRollSpeed, GetWorld()->GetDeltaSeconds(), 2.f);
 	}
 }
+
+float ASpaceShooterPawn::TakeDamage(float Damage, FDamageEvent const & DamageEvent, AController * EventInstigator, AActor * DamageCauser)
+{
+	Stats->LowerStat(Stats->Health, Damage);
+	return 0.0f;
+}
+
