@@ -16,8 +16,9 @@ public:
 	AEnemyMinion();
 
 
+	
 	UPROPERTY(Category = Mesh, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	class UStaticMeshComponent* PlaneMesh;
+		class UDestructibleComponent* PlaneMesh;
 
 	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
 	class USceneComponent* ShootPoint;
@@ -36,7 +37,7 @@ public:
 	class ASpaceShooterPawn* Player;
 
 	bool ToggleDetection;
-
+	bool bIsDead;
 
 	void Fire();
 
@@ -59,6 +60,11 @@ public:
 	UPROPERTY(Category = Speed, EditAnywhere)
 	float TurnSpeed;
 
+	UPROPERTY(Category = Damage, EditAnywhere)
+		float ExplodeStrength;
+	UPROPERTY(Category = Damage, EditAnywhere)
+		float ExplodeDamage;
+
 	/** Max forward speed */
 	UPROPERTY(Category = Speed, EditAnywhere)
 	float ChaseSpeed;
@@ -80,6 +86,7 @@ public:
 
 	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser) override;
 
+	FVector ProjectAlongVelocity(FVector PreviousPos, FVector CurrentPos, float ProjectAmount); //Direction Player is going * value to project along axis
 
 	bool CastSphere(FVector Location, float Radius, bool bShouldDebug = false);
 };

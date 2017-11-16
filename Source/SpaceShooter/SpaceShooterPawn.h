@@ -50,6 +50,8 @@ public:
 	virtual void NotifyHit(class UPrimitiveComponent* MyComp, class AActor* Other, class UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit) override;
 	// End AActor overrides
 
+	FVector PreviousPos;
+	
 protected:
 
 	// Begin APawn overrides
@@ -90,6 +92,7 @@ private:
 	UPROPERTY(Category = Speed, EditAnywhere)
 		float HoverAcceleration;
 
+	
 	/** How quickly pawn can steer */
 	UPROPERTY(Category = Speed, EditAnywhere)
 		float TurnSpeed;
@@ -97,6 +100,7 @@ private:
 		float HoverTurnSpeed;
 
 
+	
 
 	/** Max forward speed */
 	UPROPERTY(Category = Speed, EditAnywhere)
@@ -149,6 +153,9 @@ private:
 
 	FVector HoverMove;
 public:
+
+	UPROPERTY(Category = Score, EditAnywhere)
+		int32 Score;;
 
 	//virtual float TakeDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser) override;

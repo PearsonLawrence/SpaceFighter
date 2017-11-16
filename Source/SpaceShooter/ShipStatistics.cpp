@@ -1,8 +1,6 @@
-
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #include "ShipStatistics.h"
-
+// Fill out your copyright notice in the Description page of Project Settings.
+#include "Engine/World.h"
 
 // Sets default values for this component's properties
 UShipStatistics::UShipStatistics()
@@ -38,8 +36,23 @@ void UShipStatistics::LowerStat(float & Stat, float LowerAmount)
 	Stat -= LowerAmount;
 }
 
-void UShipStatistics::Die(bool bIsPlayer)
+void UShipStatistics::RaiseStat(float & Stat, float RaiseAmount)
 {
-	
+	Stat += RaiseAmount;
+}
+
+void UShipStatistics::Die(AActor* ActorToDie, bool bIsPlayer)
+{
+	if (ActorToDie != nullptr)
+	{
+		if (!bIsPlayer)
+			GetWorld()->DestroyActor(ActorToDie);
+		else
+			return;
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Null Reference for Actor To Die"));
+	}
 }
 

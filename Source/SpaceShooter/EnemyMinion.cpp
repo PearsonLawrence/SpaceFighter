@@ -13,32 +13,22 @@
 #include "DrawDebugHelpers.h"
 #include "SpaceShooterPawn.h"
 #include "ShipStatistics.h"
+#include "DestructibleComponent.h"
 // Sets default values
 AEnemyMinion::AEnemyMinion()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	struct FConstructorStatics
-	{
-		ConstructorHelpers::FObjectFinderOptional<UStaticMesh> PlaneMesh;
-		FConstructorStatics()
-			: PlaneMesh(TEXT("/Game/Flying/Meshes/UFO.UFO"))
-		{
-		}
-	};
-	static FConstructorStatics ConstructorStatics;
 
-	PlaneMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PlaneMesh0"));
-	PlaneMesh->SetStaticMesh(ConstructorStatics.PlaneMesh.Get());	// Set static mesh
-	RootComponent = PlaneMesh;
+	PlaneMesh = CreateDefaultSubobject<UDestructibleComponent>(TEXT("PlaneMesh0"));	// Set static mesh
+	
+	PlaneMesh->AttachTo(RootComponent);
 
 	Cannon1 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Cannon1"));		// Only the owning player wil
-	Cannon1->SetupAttachment(PlaneMesh, TEXT("CannonCenter"));
-
-
+	Cannon1->AttachTo(RootComponent);
 
 	ShootPoint = CreateDefaultSubobject<USceneComponent>(TEXT("ShootPoint"));
-	ShootPoint->SetupAttachment(PlaneMesh, TEXT("CenterShootPoint"));
+	ShootPoint->AttachTo(RootComponent);
 
 	Stats = CreateDefaultSubobject<UShipStatistics>(TEXT("ShipStatisticsComponent"));
 	Stats->Health = 100;
@@ -66,7 +56,7 @@ void AEnemyMinion::Fire()
 				if (World != NULL)
 				{
 
-					const FRotator SpawnRotation = ShootPoint->GetComponentRotation();
+					const FRotator SpawnRotation = FVector(FVector((GetActorLocation() - Player->GetActorLocation()).GetSafeNormal() * -1)).Rotation();
 					// MuzzleOffset is in camera space, so transform it to world space before offsetting from the character location to find the final muzzle position
 					const FVector SpawnLocation = ((ShootPoint != nullptr) ? ShootPoint->GetComponentLocation() : ShootPoint->GetComponentLocation());
 
@@ -104,7 +94,7 @@ void AEnemyMinion::Tick(float DeltaTime)
 
 
 	
-	if (ToggleDetection)
+	if (ToggleDetection && bIsDead == false)
 	{
 		
 
@@ -123,7 +113,7 @@ void AEnemyMinion::Tick(float DeltaTime)
 
 
 
-					Rotation = FVector(FVector((GetActorLocation() - Player->GetActorLocation()) + Player->GetVelocity()).GetSafeNormal() * -1).Rotation();
+					Rotation = FVector(FVector((GetActorLocation() - Player->GetActorLocation()).GetSafeNormal() * -1)).Rotation();
 
 					SetActorRotation(FMath::RInterpTo(GetActorRotation(), Rotation, DeltaTime, TurnSpeed));
 				}
@@ -141,7 +131,7 @@ void AEnemyMinion::Tick(float DeltaTime)
 
 
 
-					Rotation = FVector(FVector((GetActorLocation() - Player->GetActorLocation()) + Player->GetVelocity()).GetSafeNormal() * -1).Rotation();
+					Rotation = FVector(FVector((GetActorLocation() - Player->GetActorLocation()).GetSafeNormal() * -1)).Rotation();
 
 					SetActorRotation(FMath::RInterpTo(GetActorRotation(), Rotation, DeltaTime, TurnSpeed));
 				}
@@ -156,8 +146,6 @@ void AEnemyMinion::Tick(float DeltaTime)
 					}
 				}
 				
-
-
 			}
 		
 	}
@@ -195,6 +183,24 @@ bool AEnemyMinion::CastSphere(FVector Location, float Radius, bool bShouldDebug)
 float AEnemyMinion::TakeDamage(float Damage, FDamageEvent const & DamageEvent, AController * EventInstigator, AActor * DamageCauser)
 {
 	Stats->LowerStat(Stats->Health, Damage);
+	if (Stats->Health <= 0)
+	{
+		PlaneMesh->ApplyDamage(ExplodeDamage, GetActorLocation(), GetActorLocation(), ExplodeStrength);
+		PlaneMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		PlaneMesh->SetSimulatePhysics(true);
+		bIsDead = true;
+		Player->Score++;
+	}
 	return 0.0f;
+}
+
+FVector AEnemyMinion::ProjectAlongVelocity(FVector PreviousPos, FVector CurrentPos, float ProjectAmount)
+{
+	FVector returnVal = ((PreviousPos - CurrentPos).GetSafeNormal() * -ProjectAmount) + CurrentPos;
+	DrawDebugSphere(GetWorld(), returnVal, 20, 45, FColor::Red, false, 1);
+
+	return returnVal;
+
+	
 }
 

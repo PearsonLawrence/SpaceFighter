@@ -7,7 +7,6 @@
 
 
 
-
 USpaceFighterGameInstance::USpaceFighterGameInstance(const FObjectInitializer& ObjectInitializer)
 {
 	/*ConstructorHelpers::FClassFinder<APlatformTrigger> PlatformTriggerBPClass(TEXT("/Game/PuzzlePlatforms/PlatformTrigger_BP"));

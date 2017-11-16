@@ -14,6 +14,7 @@
 #include "BaseProjectile.h"
 #include "Components/PrimitiveComponent.h"
 #include "ShipStatistics.h"
+#include "DrawDebugHelpers.h"
 
 ASpaceShooterPawn::ASpaceShooterPawn()
 {
@@ -93,8 +94,11 @@ void ASpaceShooterPawn::FlyMovement(float DeltaSeconds)
 	const FVector LocalMove = FVector(CurrentForwardSpeed * DeltaSeconds, 0, 0);
 
 
+	FVector PrevPos = GetActorLocation();
 	// Move plan forwards (with sweep so we stop when we collide with things)
 	AddActorLocalOffset(LocalMove, true);
+
+	
 	//AddActorWorldOffset(WorldMove, true);
 	// Calculate change in rotation this frame
 	FRotator DeltaRotation(0, 0, 0);
@@ -119,9 +123,14 @@ void ASpaceShooterPawn::HoverMovement(float DeltaSeconds)
 	HoverMove.X = (ForwardVal == 0) ? FMath::FInterpTo(HoverMove.X, 0, DeltaSeconds, HoverDrag) : FMath::Clamp(HoverMove.X,HoverMinSpeed,HoverMaxSpeed);
 	HoverMove.Y = (RightVal == 0) ? FMath::FInterpTo(HoverMove.Y, 0, DeltaSeconds, HoverDrag) : FMath::Clamp(HoverMove.Y, HoverMinSpeed, HoverMaxSpeed);
 
-
+	FVector PrevPos = GetActorLocation();
 	// Move plan forwards (with sweep so we stop when we collide with things)
 	AddActorLocalOffset(HoverMove, true);
+
+	
+	
+
+
 	//AddActorWorldOffset(WorldMove, true);
 	// Calculate change in rotation this frame
 	FRotator DeltaRotation(0, 0, 0);

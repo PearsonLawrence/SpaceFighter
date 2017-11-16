@@ -30,9 +30,14 @@ public:
 	UPROPERTY(Category = PlayerStats, EditAnywhere)
 	float Energy;
 
+	UPROPERTY(Category = PlayerStats, EditAnywhere)
+	int32 ShipKills;
+
 
 	void LowerStat(float &Stat, float LowerAmount);
 
-	void Die(bool bIsPlayer);
+	void RaiseStat(float &Stat, float RaiseAmount);
+
+	void Die(AActor* ActorToDie, bool bIsPlayer = false);
 
 };
