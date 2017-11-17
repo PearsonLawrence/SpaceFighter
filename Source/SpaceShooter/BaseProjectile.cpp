@@ -34,7 +34,7 @@ ABaseProjectile::ABaseProjectile()
 	ProjectileMovement->ProjectileGravityScale = 0;
 
 	CollisionComp->SetSimulatePhysics(false);
-
+	DamageAmount = 10;
 	// Die after 3 seconds by default
 	InitialLifeSpan = 3.0f;
 }
@@ -46,11 +46,14 @@ void ABaseProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UP
 	{
 		TSubclassOf<UDamageType> const ValidDamageTypeClass = TSubclassOf<UDamageType>(UDamageType::StaticClass());
 		FDamageEvent dmgEvent(ValidDamageTypeClass);
-		UE_LOG(LogTemp, Warning, TEXT("BAM"));
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), PS, GetActorTransform());
 /*
+	
 		UGameplayStatics::ApplyDamage(OtherActor, 10.0f, GetInstigatorController(), this, type);*/
-		OtherActor->TakeDamage(10.0f, dmgEvent, GetInstigatorController(), this);
+		if (OtherComp->ComponentHasTag(FName("Damage")))
+		{
+			OtherActor->TakeDamage(DamageAmount, dmgEvent, GetInstigatorController(), this);
+		}
 		Destroy();
 	}
 }

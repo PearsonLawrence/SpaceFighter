@@ -56,7 +56,6 @@ ASpaceShooterPawn::ASpaceShooterPawn()
 	Cannon1->SetupAttachment(PlaneMesh, TEXT("CannonLeft"));
 
 
-
 	ShootPointLeft = CreateDefaultSubobject<USceneComponent>(TEXT("ShootLeft"));
 	ShootPointLeft->SetupAttachment(PlaneMesh, TEXT("LeftShootPoint"));
 
@@ -145,7 +144,6 @@ void ASpaceShooterPawn::HoverMovement(float DeltaSeconds)
 
 void ASpaceShooterPawn::ToggleHover()
 {
-	UE_LOG(LogTemp, Warning, TEXT("toggle"));
 
 	bIsHovering = (bIsHovering) ? false : true;
 }

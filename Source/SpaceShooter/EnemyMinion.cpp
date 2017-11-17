@@ -72,6 +72,41 @@ void AEnemyMinion::Fire()
 		
 	
 }
+void AEnemyMinion::HoverMovement(float DeltaTime)
+{
+	FVector Location;
+	Location = (GetActorLocation() - Player->GetActorLocation()).GetSafeNormal() * HoverStoppingDistance + Player->GetActorLocation();
+
+
+	SetActorLocation(FMath::VInterpTo(GetActorLocation(), Location, DeltaTime, HoverSpeed));
+
+	FRotator Rotation;
+
+
+
+	Rotation = FVector(FVector((GetActorLocation() - Player->GetActorLocation()).GetSafeNormal() * -1)).Rotation();
+
+	SetActorRotation(FMath::RInterpTo(GetActorRotation(), Rotation, DeltaTime, TurnSpeed));
+}
+void AEnemyMinion::ChaseMovement(float DeltaTime)
+{
+
+	const FVector LocalMove = FVector(ChaseSpeed * DeltaTime, 0, 0);
+
+
+	// Move plan forwards (with sweep so we stop when we collide with things)
+	AddActorLocalOffset(LocalMove, true);
+
+	//SetActorLocation(FMath::VInterpTo(GetActorLocation(), Player->GetActorLocation(), DeltaTime, MaxSpeed));
+
+	FRotator Rotation;
+
+
+
+	Rotation = FVector(FVector((GetActorLocation() - Player->GetActorLocation()).GetSafeNormal() * -1)).Rotation();
+
+	SetActorRotation(FMath::RInterpTo(GetActorRotation(), Rotation, DeltaTime, TurnSpeed));
+}
 // Called when the game starts or when spawned
 void AEnemyMinion::BeginPlay()
 {
@@ -103,37 +138,11 @@ void AEnemyMinion::Tick(float DeltaTime)
 				if (Player->bIsHovering)
 				{
 					
-					FVector Location;
-					Location = (GetActorLocation() - Player->GetActorLocation()).GetSafeNormal() * HoverStoppingDistance + Player->GetActorLocation();
-
-
-					SetActorLocation(FMath::VInterpTo(GetActorLocation(), Location, DeltaTime, HoverSpeed));
-
-					FRotator Rotation;
-
-
-
-					Rotation = FVector(FVector((GetActorLocation() - Player->GetActorLocation()).GetSafeNormal() * -1)).Rotation();
-
-					SetActorRotation(FMath::RInterpTo(GetActorRotation(), Rotation, DeltaTime, TurnSpeed));
+					HoverMovement(DeltaTime);
 				}
 				else
 				{
-					const FVector LocalMove = FVector(ChaseSpeed * DeltaTime, 0, 0);
-
-
-					// Move plan forwards (with sweep so we stop when we collide with things)
-					AddActorLocalOffset(LocalMove, true);
-
-					//SetActorLocation(FMath::VInterpTo(GetActorLocation(), Player->GetActorLocation(), DeltaTime, MaxSpeed));
-
-					FRotator Rotation;
-
-
-
-					Rotation = FVector(FVector((GetActorLocation() - Player->GetActorLocation()).GetSafeNormal() * -1)).Rotation();
-
-					SetActorRotation(FMath::RInterpTo(GetActorRotation(), Rotation, DeltaTime, TurnSpeed));
+					ChaseMovement(DeltaTime);
 				}
 				setShootDelay -= DeltaTime;
 

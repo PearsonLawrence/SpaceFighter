@@ -22,6 +22,8 @@ class SPACESHOOTER_API ABaseProjectile : public AActor
 	UPROPERTY(EditAnywhere, Category = Projectile)
 		class UParticleSystem* PS;
 
+	UPROPERTY(EditAnywhere, Category = Projectile)
+		float DamageAmount;
 
 
 public:
