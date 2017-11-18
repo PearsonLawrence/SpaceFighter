@@ -24,6 +24,7 @@ public:
 	class USceneComponent* ShootPoint;
 
 
+
 	UPROPERTY(VisibleAnywhere)
 	class UShipStatistics* Stats;
 

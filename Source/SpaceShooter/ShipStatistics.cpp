@@ -48,7 +48,7 @@ void UShipStatistics::Die(AActor* ActorToDie, bool bIsPlayer)
 		if (!bIsPlayer)
 			GetWorld()->DestroyActor(ActorToDie);
 		else
-			return;
+			GetWorld()->GetFirstPlayerController()->UnPossess();
 	}
 	else
 	{

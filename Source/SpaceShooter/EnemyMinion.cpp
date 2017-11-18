@@ -23,7 +23,7 @@ AEnemyMinion::AEnemyMinion()
 	PlaneMesh = CreateDefaultSubobject<UDestructibleComponent>(TEXT("PlaneMesh0"));	// Set static mesh
 	
 	PlaneMesh->AttachTo(RootComponent);
-
+	RootComponent = PlaneMesh;
 	Cannon1 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Cannon1"));		// Only the owning player wil
 	Cannon1->AttachTo(RootComponent);
 
@@ -66,6 +66,7 @@ void AEnemyMinion::Fire()
 
 					// spawn the projectile at the muzzle
 					World->SpawnActor<ABaseProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
+				
 				}
 			}
 
@@ -75,8 +76,11 @@ void AEnemyMinion::Fire()
 void AEnemyMinion::HoverMovement(float DeltaTime)
 {
 	FVector Location;
-	Location = (GetActorLocation() - Player->GetActorLocation()).GetSafeNormal() * HoverStoppingDistance + Player->GetActorLocation();
 
+		Location = ((GetActorLocation() - Player->GetActorLocation()).GetSafeNormal() * HoverStoppingDistance) + Player->GetActorLocation();
+
+	
+	
 
 	SetActorLocation(FMath::VInterpTo(GetActorLocation(), Location, DeltaTime, HoverSpeed));
 

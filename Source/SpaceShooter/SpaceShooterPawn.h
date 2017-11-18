@@ -11,7 +11,7 @@ class ASpaceShooterPawn : public APawn
 {
 
 	GENERATED_BODY()
-
+public:
 		/** StaticMesh component that will be the visuals for our flying pawn */
 	UPROPERTY(Category = Mesh, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UStaticMeshComponent* PlaneMesh;
@@ -33,7 +33,10 @@ class ASpaceShooterPawn : public APawn
 	UPROPERTY(EditAnywhere, Category = Projectile)
 	TSubclassOf<class ABaseProjectile> ProjectileClass;
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(EditAnywhere, Category = Projectile)
+	class USoundBase* sound;
+
+	UPROPERTY(Category = stats, VisibleDefaultsOnly, BlueprintReadOnly)
 	class UShipStatistics* Stats;
 
 	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)

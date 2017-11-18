@@ -15,7 +15,7 @@
 #include "Components/PrimitiveComponent.h"
 #include "ShipStatistics.h"
 #include "DrawDebugHelpers.h"
-
+#include "Sound/SoundBase.h"
 ASpaceShooterPawn::ASpaceShooterPawn()
 {
 	// Structure to hold one-time initialization
@@ -211,11 +211,15 @@ void ASpaceShooterPawn::Fire(float Val)
 				UWorld* const World = GetWorld();
 				if (World != NULL)
 				{
-				
-					const FRotator SpawnRotation = ShootPointLeft->GetComponentRotation();
+					if (sound != nullptr)
+					{
+						UGameplayStatics::SpawnSoundAtLocation(GetWorld(), sound, GetActorLocation(),FRotator::ZeroRotator,.5f);
+					}
+
+						const FRotator SpawnRotation = ShootPointLeft->GetComponentRotation();
 						// MuzzleOffset is in camera space, so transform it to world space before offsetting from the character location to find the final muzzle position
 						const FVector SpawnLocation = ((ShootPointLeft != nullptr) ? ShootPointLeft->GetComponentLocation() : ShootPointLeft->GetComponentLocation());
-
+					
 						//Set Spawn Collision Handling Override
 						FActorSpawnParameters ActorSpawnParams;
 						ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
@@ -359,6 +363,10 @@ void ASpaceShooterPawn::HoverRoll(float Val)
 float ASpaceShooterPawn::TakeDamage(float Damage, FDamageEvent const & DamageEvent, AController * EventInstigator, AActor * DamageCauser)
 {
 	Stats->LowerStat(Stats->Health, Damage);
+	if (Stats->Health <= 0)
+	{
+		Stats->Die(this, true);
+	}
 	return 0.0f;
 }
 

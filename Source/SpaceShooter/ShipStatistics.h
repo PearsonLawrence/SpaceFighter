@@ -24,13 +24,13 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	UPROPERTY(Category = PlayerStats, EditAnywhere)
+	UPROPERTY(Category = PlayerStats, EditAnywhere, BlueprintReadOnly)
 	float Health;
 
-	UPROPERTY(Category = PlayerStats, EditAnywhere)
+	UPROPERTY(Category = PlayerStats, EditAnywhere, BlueprintReadOnly)
 	float Energy;
 
-	UPROPERTY(Category = PlayerStats, EditAnywhere)
+	UPROPERTY(Category = PlayerStats, EditAnywhere, BlueprintReadOnly)
 	int32 ShipKills;
 
 

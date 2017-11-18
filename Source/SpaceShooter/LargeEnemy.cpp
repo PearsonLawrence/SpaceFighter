@@ -210,7 +210,7 @@ void ALargeEnemy::Tick(float DeltaTime)
 
 			setShootDelay -= DeltaTime;
 
-			if (CastSphere(GetActorLocation(), RetreatRadius, true))
+			if (CastSphere(GetActorLocation(), RetreatRadius))
 			{
 				FVector Location;
 				Location = (GetActorLocation() - Player->GetActorLocation()).GetSafeNormal() * HoverStoppingDistance + Player->GetActorLocation();
